@@ -1,46 +1,42 @@
 # AI Service
 
-هذه خدمة Node.js مبنية بـ Express.js. مسؤوليتها الرد على أسئلة المستخدم حول مصاريفه وديونه ومجموعاته باستخدام تقنية RAG ونموذج لغوي.
+This is a Node.js service built with Express.js. It is responsible for answering user questions regarding their expenses, debts, and groups using RAG technology and a language model.
 
-## التشغيل
+## Setup
 
-انسخ ملف .env.example إلى ملف باسم .env.
-ضع فيه قيمة GROQ_API_KEY الحقيقية.
-ضع فيه قيمة JWT_SECRET وتأكد أنها نفس القيمة المستخدمة في خدمة تسجيل الدخول الرئيسية للمشروع.
-ضع فيه قيمة DATABASE_URL الحقيقية لقاعدة بيانات المشروع.
 
-بعد ذلك نفذ الأمر التالي لتثبيت الحزم:
+Then, run the following command to install dependencies:
 
 npm install
 
-ثم شغل الخادم بالأمر التالي:
+Start the server with the following command:
 
 npm start
 
-## نقاط النهاية
+## Endpoints
 
-توجد نقطة نهاية باسم /api/chat تستقبل طلب POST يحتوي على حقل باسم question، وترجع إجابة كاملة مع مصادرها.
+There is an endpoint named `/api/chat` that accepts a POST request containing a field named `question` and returns a complete answer along with its sources.
 
-توجد نقطة نهاية باسم /api/chat/stream تستقبل نفس الطلب لكنها ترجع الإجابة تدريجياً عبر تقنية Server-Sent Events.
+There is an endpoint named `/api/chat/stream` that accepts the same request but returns the answer incrementally using Server-Sent Events.
 
-توجد نقطة نهاية باسم /api/sentiment تستقبل حقل باسم text وترجع تصنيف مشاعر هذا النص.
+There is an endpoint named `/api/sentiment` that accepts a field named `text` and returns the sentiment classification for that text.
 
-توجد نقطة نهاية باسم /health لا تحتاج توكن، وتستخدم لمعرفة حالة الخدمة.
+There is an endpoint named `/health` that does not require a token and is used to check the service's status.
 
-جميع نقاط /api تحتاج ترويسة باسم Authorization تحتوي على كلمة Bearer متبوعة بتوكن JWT صالح.
+All `/api` endpoints require an `Authorization` header containing the word "Bearer" followed by a valid JWT token.
 
-## الاختبار الأمني
+## Security Testing
 
-يوجد ملف اختبار في المسار tests/security.test.js يتأكد أن كل مستخدم لا يرى إلا بياناته الخاصة فقط.
+There is a test file located at `tests/security.test.js` that verifies users can only access their own data.
 
-لتشغيله يجب أولاً تشغيل الخادم بدون قيمة في DATABASE_URL، حتى تُستخدم البيانات التجريبية المنفصلة لكل مستخدم.
+To run it, the server must first be started without a `DATABASE_URL` value so that separate mock data is used for each user.
 
-بعد ذلك نفذ الأمر التالي في نافذة طرفية أخرى:
+Then, run the following command in a separate terminal window:
 
 npm run test:security
 
-## ملاحظة مهمة لفريق الباك اند
+## Important Note for the Backend Team
 
-الملف src/dataSource.js يحتوي على استعلامات SQL تفترض وجود جداول باسم expenses وباسم debts وباسم groups وباسم group_members وباسم users.
+The file `src/dataSource.js` contains SQL queries that assume the existence of tables named `expenses`, `debts`, `groups`, `group_members`, and `users`.
 
-إذا كانت أسماء الجداول أو الأعمدة الحقيقية في المشروع مختلفة، يجب تعديل هذا الملف ليطابقها قبل الدمج النهائي.
+If the actual table or column names in the project differ, this file must be updated to match them before the final merge.
