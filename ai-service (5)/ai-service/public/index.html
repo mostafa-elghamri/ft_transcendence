@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<title>اختبار الشات الذكي</title>
+<style>
+body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 0 16px; }
+#log { border: 1px solid #ccc; border-radius: 8px; padding: 12px; min-height: 300px; margin-bottom: 12px; white-space: pre-wrap; }
+.msg-user { color: #0a58ca; margin: 8px 0; }
+.msg-bot { color: #198754; margin: 8px 0; }
+.msg-sources { color: #888; font-size: 12px; margin: 4px 0 12px; }
+input, textarea { width: 100%; padding: 8px; margin-bottom: 8px; box-sizing: border-box; }
+button { padding: 8px 16px; cursor: pointer; margin-inline-end: 8px; }
+</style>
+</head>
+<body>
+<h2>اختبار الشات الذكي</h2>
+<p>صفحة اختبار مؤقتة، ليست الواجهة النهائية للمشروع.</p>
+
+<label>JWT Token</label>
+<input id="token" placeholder="الصق هنا توكن JWT" />
+
+<div id="log"></div>
+
+<textarea id="question" rows="2" placeholder="مثال: كم أدين إجمالاً؟"></textarea>
+<!-- <button onclick="sendNormal()">إرسال عادي</button> -->
+<button onclick="sendStreaming()">إرسال متدفق</button>
+
+<script>
+function appendUserMessage(question) {
+  var log = document.getElementById('log');
+  var div = document.createElement('div');
+  div.className = 'msg-user';
+  div.textContent = 'أنت: ' + question;
+  log.appendChild(div);
+}
+
+function buildHeaders(token) {
+  var headers = { 'Content-Type': 'application/json' };
+
+  if (token) {
+    headers['Authorization'] = 'Bearer ' + token;
+  }
+
+  return headers;
+}
+
+function sendNormal() {
+  var questionInput = document.getElementById('question');
+  var tokenInput = document.getElementById('token');
+  var question = questionInput.value.trim();
+  var token = tokenInput.value.trim();
+  var log = document.getElementById('log');
+
+  if (question.length === 0) {
+    return;
+  }
+
+  appendUserMessage(question);
+  questionInput.value = '';
+
+  fetch('/api/chat', {
+    method: 'POST',
+    headers: buildHeaders(token),
+    body: JSON.stringify({ question: question })
+  }).then(function (response) {
+    return response.json();
+  }).then(function (data) {
+    var botDiv = document.createElement('div');
+    botDiv.className = 'msg-bot';
+
+    if (data.answer) {
+      botDiv.textContent = 'المساعد: ' + data.answer;
+    } else {
+      botDiv.textContent = 'المساعد: ' + data.error;
+    }
+
+    log.appendChild(botDiv);
+
+    if (data.sources && data.sources.length > 0) {
+      var sourcesDiv = document.createElement('div');
+      sourcesDiv.className = 'msg-sources';
+      sourcesDiv.textContent = 'المصادر: ' + data.sources.length + ' مقطع';
+      log.appendChild(sourcesDiv);
+    }
+
+    log.scrollTop = log.scrollHeight;
+  }).catch(function (error) {
+    var errorDiv = document.createElement('div');
+    errorDiv.className = 'msg-bot';
+    errorDiv.textContent = 'خطأ: ' + error.message;
+    log.appendChild(errorDiv);
+  });
+}
+
+function sendStreaming() {
+  var questionInput = document.getElementById('question');
+  var tokenInput = document.getElementById('token');
+  var question = questionInput.value.trim();
+  var token = tokenInput.value.trim();
+  var log = document.getElementById('log');
+
+  if (question.length === 0) {
+    return;
+  }
+
+  appendUserMessage(question);
+  questionInput.value = '';
+
+  var botDiv = document.createElement('div');
+  botDiv.className = 'msg-bot';
+  botDiv.textContent = 'المساعد: ';
+  log.appendChild(botDiv);
+
+  fetch('/api/chat/stream', {
+    method: 'POST',
+    headers: buildHeaders(token),
+    body: JSON.stringify({ question: question })
+  }).then(function (response) {
+    var reader = response.body.getReader();
+    var decoder = new TextDecoder();
+    var buffer = '';
+
+    function readChunk() {
+      return reader.read().then(function (result) {
+        if (result.done === true) {
+          return;
+        }
+
+        buffer = buffer + decoder.decode(result.value, { stream: true });
+
+        var events = buffer.split('\n\n');
+        buffer = events.pop();
+
+        for (var i = 0; i < events.length; i++) {
+          var lines = events[i].split('\n');
+          var eventType = null;
+          var dataLine = null;
+
+          for (var j = 0; j < lines.length; j++) {
+            if (lines[j].indexOf('event:') === 0) {
+              eventType = lines[j].slice(6).trim();
+            }
+
+            if (lines[j].indexOf('data:') === 0) {
+              dataLine = lines[j].slice(5).trim();
+            }
+          }
+
+          if (dataLine === null) {
+            continue;
+          }
+
+          var data = JSON.parse(dataLine);
+
+          if (eventType === 'token') {
+            botDiv.textContent = botDiv.textContent + data.text;
+          }
+
+          if (eventType === 'sources') {
+            if (data.sources && data.sources.length > 0) {
+              var sourcesDiv = document.createElement('div');
+              sourcesDiv.className = 'msg-sources';
+              sourcesDiv.textContent = 'المصادر: ' + data.sources.length + ' مقطع';
+              log.insertBefore(sourcesDiv, botDiv);
+            }
+          }
+        }
+
+        log.scrollTop = log.scrollHeight;
+
+        return readChunk();
+      });
+    }
+
+    return readChunk();
+  }).catch(function (error) {
+    botDiv.textContent = botDiv.textContent + ' خطأ: ' + error.message;
+  });
+}
+</script>
+</body>
+</html>
