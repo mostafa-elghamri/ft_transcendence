@@ -1,0 +1,21 @@
+{
+  "name": "splitwise-ai-service",
+  "version": "1.0.0",
+  "description": "RAG + LLM service for ft_transcendence",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "init-indexes": "node scripts/initIndexes.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.9.0",
+    "mongoose": "^9.11.1"
+  }
+}

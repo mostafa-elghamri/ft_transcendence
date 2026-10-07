@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>المساعد المالي الذكي</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        chef: {
+          50:  '#f5faff',
+          100: '#e0f0fa',
+          200: '#b8ddf2',
+          300: '#89c4e8',
+          400: '#5aa8dd',
+          500: '#2c8ccb',
+          600: '#1f6fa8',
+          700: '#185686',
+          800: '#123f63',
+          900: '#0a2840'
+        },
+        sky: {
+          soft: '#dbeafe',
+          mid:  '#93c5fd',
+          deep: '#3b82f6'
+        }
+      },
+      fontFamily: {
+        sans: ['Segoe UI', 'Tahoma', 'sans-serif']
+      },
+      boxShadow: {
+        chef: '0 4px 20px -4px rgba(44, 140, 203, 0.15)',
+        'chef-lg': '0 8px 32px -8px rgba(44, 140, 203, 0.25)'
+      }
+    }
+  }
+};
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body {
+    background: linear-gradient(180deg, #f5faff 0%, #e0f0fa 100%);
+    min-height: 100vh;
+  }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #f5faff; }
+  ::-webkit-scrollbar-thumb { background: #89c4e8; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #5aa8dd; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .msg-enter { animation: fadeIn 0.3s ease-out; }
+
+  @keyframes pulse-dot {
+    0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+    40%           { opacity: 1;   transform: scale(1); }
+  }
+  .dot { animation: pulse-dot 1.4s infinite ease-in-out; }
+  .dot:nth-child(1) { animation-delay: 0s; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+
+  .chef-pattern {
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(44,140,203,0.06) 0%, transparent 40%),
+      radial-gradient(circle at 80% 70%, rgba(90,168,221,0.08) 0%, transparent 40%);
+  }
+
+  /* شريط جانبي على يسار الشاشة في RTL */
+  .layout-wrap {
+    display: flex;
+    flex-direction: row; /* RTL: first child = right, second = left */
+  }
+  /* نجعل الـ sidebar يأتي ثانياً في DOM ليظهر على اليسار */
+</style>
+</head>
+
+<body class="text-chef-800 font-sans chef-pattern">
+
+  <!-- Header -->
+  <header class="bg-gradient-to-l from-chef-500 via-chef-400 to-sky-mid text-white shadow-chef-lg">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center gap-3">
+      <div class="w-11 h-11 bg-white rounded-full flex items-center justify-center text-chef-500 text-xl font-bold shadow-md ring-4 ring-white/30">
+        م
+      </div>
+      <div>
+        <h1 class="text-lg font-bold tracking-tight">المساعد المالي الذكي</h1>
+        <p class="text-xs opacity-95">تقسيم المصاريف — بروح شفشاون الزرقاء</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main: 2 columns (chat on right, sidebar on LEFT) -->
+  <main class="max-w-6xl mx-auto p-4">
+    <div class="layout-wrap gap-4">
+
+      <!-- ═══ العمود الأول (يمين في RTL): منطقة الشات ═══ -->
+      <div class="flex-1 min-w-0 space-y-4 order-1 md:order-1">
+
+        <!-- Chat log -->
+        <section
+          id="log"
+          class="bg-white rounded-2xl shadow-chef border border-chef-100 p-4 h-[26rem] overflow-y-auto space-y-3"
+        >
+          <div class="text-center text-chef-300 text-sm py-8">
+            ✨ ابدأ بطرح سؤالك...
+          </div>
+        </section>
+
+        <!-- Question input -->
+        <section class="bg-white rounded-2xl shadow-chef border border-chef-100 p-4 space-y-3">
+          <textarea
+            id="question"
+            rows="2"
+            placeholder="مثال: كم أدين إجمالاً في رحلة مراكش؟"
+            class="w-full p-2.5 border border-chef-200 rounded-lg bg-chef-50 focus:outline-none focus:ring-2 focus:ring-chef-400 focus:border-transparent text-sm resize-none transition"
+          ></textarea>
+
+          <div class="flex gap-2">
+            <button
+              onclick="sendStreaming()"
+              id="sendBtn"
+              class="flex-1 bg-gradient-to-l from-chef-500 to-chef-400 hover:from-chef-600 hover:to-chef-500 active:from-chef-700 active:to-chef-600 text-white py-2.5 rounded-lg font-medium transition shadow-chef disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              إرسال ✈
+            </button>
+            <button
+              onclick="clearChat()"
+              class="px-4 bg-chef-100 hover:bg-chef-200 text-chef-700 py-2.5 rounded-lg transition"
+              title="مسح المحادثة"
+            >
+              مسح
+            </button>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ═══ العمود الثاني (يسار في RTL): Sidebar ضيق ═══ -->
+      <aside class="w-full md:w-72 shrink-0 space-y-3 order-2 md:order-2">
+
+        <!-- Token -->
+        <section class="bg-white rounded-2xl shadow-chef border border-chef-100 p-3">
+          <label class="block text-xs font-semibold text-chef-700 mb-1.5">
+            🔐 توكن الدخول (JWT)
+          </label>
+          <input
+            id="token"
+            type="password"
+            placeholder="الصق التوكن هنا..."
+            class="w-full p-2 border border-chef-200 rounded-lg bg-chef-50 focus:outline-none focus:ring-2 focus:ring-chef-400 focus:border-transparent text-xs transition"
+          />
+          <p class="text-[10px] text-chef-400 mt-1.5 leading-tight">
+            في وضع MOCK_AUTH استخدم رقم المستخدم (1-10).
+          </p>
+        </section>
+
+        <!-- Group Selector -->
+        <section class="bg-white rounded-2xl shadow-chef border border-chef-100 p-3">
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-xs font-semibold text-chef-700">
+              📁 اسأل عن مجموعة
+            </label>
+            <button
+              onclick="loadGroups()"
+              class="text-[10px] text-chef-500 hover:text-chef-700 transition"
+              title="تحديث القائمة"
+            >
+              ↻
+            </button>
+          </div>
+          <select
+            id="group"
+            class="w-full p-2 border border-chef-200 rounded-lg bg-chef-50 focus:outline-none focus:ring-2 focus:ring-chef-400 focus:border-transparent text-xs transition"
+          >
+            <option value="">كل مجموعاتي</option>
+          </select>
+          <p id="group-hint" class="text-[10px] text-chef-400 mt-1.5 leading-tight">
+            اختر مجموعة لطرح أسئلة عنها.
+          </p>
+        </section>
+
+        <!-- Suggestions -->
+        <section class="bg-white rounded-2xl shadow-chef border border-chef-100 p-3">
+          <p class="text-[10px] text-chef-400 mb-2 text-center">💡 اقتراحات سريعة</p>
+          <div id="suggestions" class="flex flex-wrap justify-center gap-1.5"></div>
+        </section>
+
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center text-xs text-chef-400 py-5">
+    ft_transcendence — المساعد المالي الذكي · ألوان مستوحاة من شفشاون 💙
+  </footer>
+
+<script>
+/* ========== Constants ========== */
+const $ = (id) => document.getElementById(id);
+const log = $('log');
+
+const DEFAULT_SUGGESTIONS = [
+  'كم أدين إجمالاً؟',
+  'من يدين لي؟',
+  'ما أكبر مصروف؟',
+  'ما إجمالي مصاريفي؟',
+  'ما آخر مصروف؟'
+];
+
+const GROUP_SUGGESTIONS = (name) => [
+  `كم إجمالي مصاريف "${name}"؟`,
+  `من دفع أكثر في "${name}"؟`,
+  `ما آخر مصروف في "${name}"؟`,
+  `كم عدد المصاريف في "${name}"؟`
+];
+
+/* ========== Helpers ========== */
+function addMessage(html, className, animate = true) {
+  const div = document.createElement('div');
+  div.className = className + (animate ? ' msg-enter' : '');
+  div.innerHTML = html;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+  return div;
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function setSuggestions(list) {
+  const box = $('suggestions');
+  box.innerHTML = '';
+  list.forEach((text) => {
+    const btn = document.createElement('button');
+    btn.textContent = text;
+    btn.className = 'text-[10px] bg-chef-50 hover:bg-chef-100 text-chef-600 border border-chef-200 px-2 py-1 rounded-full transition shadow-sm text-right';
+    btn.onclick = () => {
+      $('question').value = text;
+      sendStreaming();
+    };
+    box.appendChild(btn);
+  });
+}
+
+function setLoading(on) {
+  const btn = $('sendBtn');
+  btn.disabled = on;
+  btn.textContent = on ? 'جارٍ التفكير...' : 'إرسال ✈';
+}
+
+/* ========== Chat ========== */
+async function sendStreaming() {
+  const question = $('question').value.trim();
+  const token = $('token').value.trim();
+  const group = $('group').value;
+
+  if (!question) return;
+
+  const contextPrefix = group ? `[المجموعة: ${group}] ` : '';
+  const fullQuestion = contextPrefix + question;
+
+  addMessage(
+    `<span class="font-semibold text-chef-600">أنت:</span> ${escapeHtml(question)}`,
+    'text-chef-700 text-sm'
+  );
+
+  $('question').value = '';
+  setLoading(true);
+
+  const botDiv = addMessage(
+    `<span class="font-semibold text-chef-500">المساعد:</span> <span class="thinking"><span class="dot inline-block w-1.5 h-1.5 bg-chef-400 rounded-full mx-0.5"></span><span class="dot inline-block w-1.5 h-1.5 bg-chef-400 rounded-full mx-0.5"></span><span class="dot inline-block w-1.5 h-1.5 bg-chef-400 rounded-full mx-0.5"></span></span>`,
+    'text-chef-800 text-sm leading-relaxed',
+    true
+  );
+
+  const contentSpan = document.createElement('span');
+  let sourcesDiv = null;
+  let firstToken = true;
+
+  try {
+    const response = await fetch('/api/chat/stream', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': 'Bearer ' + token })
+      },
+      body: JSON.stringify({ question: fullQuestion })
+    });
+
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const events = buffer.split('\n\n');
+      buffer = events.pop();
+
+      for (const event of events) {
+        let type, data;
+        for (const line of event.split('\n')) {
+          if (line.startsWith('event:')) type = line.slice(6).trim();
+          if (line.startsWith('data:')) data = line.slice(5).trim();
+        }
+        if (!data) continue;
+
+        const parsed = JSON.parse(data);
+
+        if (type === 'token') {
+          if (firstToken) {
+            botDiv.querySelector('.thinking')?.remove();
+            botDiv.appendChild(contentSpan);
+            firstToken = false;
+          }
+          contentSpan.textContent += parsed.text;
+          log.scrollTop = log.scrollHeight;
+        }
+
+        if (type === 'sources' && parsed.sources?.length) {
+          if (!sourcesDiv) {
+            sourcesDiv = document.createElement('div');
+            sourcesDiv.className = 'text-[10px] text-chef-400 mt-2 pt-2 border-t border-chef-100';
+            botDiv.appendChild(sourcesDiv);
+          }
+          sourcesDiv.textContent = `📎 ${parsed.sources.length} مصدر مسترجع`;
+        }
+
+        if (type === 'error') {
+          botDiv.querySelector('.thinking')?.remove();
+          contentSpan.textContent = '⚠️ ' + (parsed.message || 'خطأ غير متوقع');
+          botDiv.appendChild(contentSpan);
+        }
+      }
+    }
+
+    if (firstToken) {
+      botDiv.querySelector('.thinking')?.remove();
+      contentSpan.textContent = '(لم يتم استلام رد)';
+      botDiv.appendChild(contentSpan);
+    }
+  } catch (error) {
+    botDiv.querySelector('.thinking')?.remove();
+    contentSpan.textContent = '⚠️ ' + error.message;
+    botDiv.appendChild(contentSpan);
+  } finally {
+    setLoading(false);
+  }
+}
+
+function clearChat() {
+  log.innerHTML = '<div class="text-center text-chef-300 text-sm py-8">✨ ابدأ بطرح سؤالك...</div>';
+}
+
+/* ========== Group Loader ========== */
+async function loadGroups() {
+  const token = $('token').value.trim();
+  if (!token) return;
+
+  try {
+    const response = await fetch('/api/groups/my', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+    const groups = data.groups || [];
+
+    const select = $('group');
+    const current = select.value;
+    select.innerHTML = '<option value="">كل مجموعاتي</option>';
+
+    groups.forEach((g) => {
+      const opt = document.createElement('option');
+      opt.value = g.name;
+      opt.textContent = '📁 ' + g.name;
+      select.appendChild(opt);
+    });
+
+    if (current) select.value = current;
+
+    const hint = $('group-hint');
+    if (groups.length === 0) {
+      hint.textContent = 'لا توجد مجموعات — تحقق من التوكن.';
+    } else {
+      hint.textContent = `لديك ${groups.length} مجموعة. اختر واحدة.`;
+    }
+  } catch (error) {
+    // Silent fail
+  }
+}
+
+/* ========== Suggestions ========== */
+function updateSuggestions() {
+  const group = $('group').value;
+  setSuggestions(group ? GROUP_SUGGESTIONS(group) : DEFAULT_SUGGESTIONS);
+}
+
+/* ========== Events ========== */
+$('token').addEventListener('blur', loadGroups);
+$('group').addEventListener('change', updateSuggestions);
+$('question').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendStreaming();
+  }
+});
+
+/* ========== Init ========== */
+updateSuggestions();
+</script>
+</body>
+</html>
