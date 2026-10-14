@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Groups - Splitify</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --sidebar-bg: #111827;
+            --main-bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --primary-green: #10b981;
+            --primary-green-hover: #059669;
+            --text-dark: #111827;
+            --text-gray: #6b7280;
+            --border-color: #e5e7eb;
+            --red-balance: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { display: flex; height: 100vh; background-color: var(--main-bg); overflow: hidden; }
+
+        /* --- SIDEBAR (Matches Dashboard Exactly) --- */
+        .sidebar {
+            width: 260px; background-color: var(--sidebar-bg); color: white;
+            display: flex; flex-direction: column; padding: 20px; flex-shrink: 0;
+        }
+
+        .logo { font-size: 20px; font-weight: 700; margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
+        .logo i { color: var(--primary-green); }
+
+        .nav-menu { list-style: none; flex-grow: 1; }
+        .nav-item { margin-bottom: 10px; }
+        .nav-link {
+            display: flex; align-items: center; padding: 12px 15px; color: #9ca3af;
+            text-decoration: none; border-radius: 8px; transition: 0.3s; font-weight: 500;
+        }
+        .nav-link:hover, .nav-link.active { background-color: rgba(255, 255, 255, 0.1); color: white; }
+        .nav-link i { width: 25px; font-size: 18px; }
+
+        .badge {
+            background-color: var(--red-balance); color: white; font-size: 12px;
+            padding: 2px 8px; border-radius: 10px; margin-left: auto;
+        }
+
+        .user-profile-mini {
+            display: flex; align-items: center; gap: 12px; padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .avatar-small {
+            width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
+            background-color: #374151;
+        }
+        .user-info h4 { font-size: 14px; font-weight: 600; }
+        .user-info p { font-size: 12px; color: #9ca3af; }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { flex-grow: 1; padding: 30px 40px; overflow-y: auto; }
+
+        .page-header { 
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; 
+        }
+        .page-title h1 { font-size: 28px; color: var(--text-dark); margin-bottom: 5px; }
+        .page-title p { color: var(--text-gray); font-size: 15px; }
+
+        .btn-create {
+            background-color: var(--primary-green); color: white; border: none;
+            padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; gap: 8px; font-size: 14px; transition: 0.2s;
+        }
+        .btn-create:hover { background-color: var(--primary-green-hover); }
+
+        /* --- GROUPS GRID --- */
+        .groups-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .group-card {
+            background: var(--card-bg); border-radius: 12px; padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03); transition: 0.2s;
+            border: 1px solid transparent; cursor: pointer;
+        }
+        .group-card:hover { border-color: var(--border-color); transform: translateY(-2px); }
+
+        .card-top { display: flex; gap: 15px; margin-bottom: 15px; }
+        .group-img {
+            width: 70px; height: 70px; border-radius: 10px; object-fit: cover;
+            background-color: #e5e7eb; flex-shrink: 0;
+        }
+        .card-info h3 { font-size: 16px; color: var(--text-dark); margin-bottom: 4px; }
+        .card-info p { font-size: 13px; color: var(--text-gray); }
+
+        .card-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-top: 15px; border-top: 1px solid var(--border-color);
+        }
+        .balance { font-size: 13px; font-weight: 600; }
+        .balance.negative { color: var(--red-balance); }
+        .balance.positive { color: var(--primary-green); }
+        .balance.zero { color: var(--text-dark); }
+
+        .view-group-btn {
+            font-size: 12px; color: var(--primary-green); font-weight: 600;
+            text-decoration: none; transition: 0.2s;
+        }
+        .view-group-btn:hover { opacity: 0.8; }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center; padding: 80px 20px; color: var(--text-gray);
+            grid-column: 1 / -1;
+        }
+        .empty-state i { font-size: 48px; margin-bottom: 20px; color: #d1d5db; }
+        .empty-state h3 { font-size: 18px; color: var(--text-dark); margin-bottom: 10px; }
+        .empty-state p { font-size: 14px; margin-bottom: 20px; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-users"></i> Splitify
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="/dashboard" class="nav-link">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/groups" class="nav-link active">
+                    <i class="fa-solid fa-layer-group"></i> My Groups
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/notifications" class="nav-link">
+                    <i class="fa-regular fa-bell"></i> Notifications
+                    <span class="badge">3</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/friends" class="nav-link">
+                    <i class="fa-solid fa-user-group"></i> Friends
+                </a>
+            </li>
+        </ul>
+
+        <div class="user-profile-mini">
+            <img src="/images/amine.jpg" alt="Amine" class="avatar-small">
+            <div class="user-info">
+                <h4>Amine Khaliloufi</h4>
+                <p>@amine</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        
+        <div class="page-header">
+            <div class="page-title">
+                <h1>My Groups</h1>
+                <p>Manage your expense groups and track balances.</p>
+            </div>
+            <a href="/CreateGroup" class="btn-create">
+                <i class="fa-solid fa-plus"></i> Create Group
+            </a>
+        </div>
+
+        <div class="groups-grid">
+            
+            <!-- Group Card 1 -->
+            <div class="group-card">
+                <div class="card-top">
+                    <img src="/images/akchour.jpg" alt="Akchour Trip" class="group-img">
+                    <div class="card-info">
+                        <h3>Akchour Trip</h3>
+                        <p>4 members • Active</p>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <span class="balance negative">You owe: 150 DH</span>
+                    <a href="/groups/akchour-trip" class="view-group-btn">View Details →</a>
+                </div>
+            </div>
+
+            <!-- Group Card 2 -->
+            <div class="group-card">
+                <div class="card-top">
+                    <img src="/images/casa.jpg" alt="Casa Weekend" class="group-img">
+                    <div class="card-info">
+                        <h3>Casa Weekend</h3>
+                        <p>5 members • Settled</p>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <span class="balance positive">Owed to you: 80 DH</span>
+                    <a href="/groups/casa-weekend" class="view-group-btn">View Details →</a>
+                </div>
+            </div>
+
+            <!-- Group Card 3 -->
+            <div class="group-card">
+                <div class="card-top">
+                    <img src="/images/university.jpg" alt="University Friends" class="group-img">
+                    <div class="card-info">
+                        <h3>University Friends</h3>
+                        <p>8 members • Active</p>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <span class="balance zero">All settled up</span>
+                    <a href="/groups/university-friends" class="view-group-btn">View Details →</a>
+                </div>
+            </div>
+
+            <!-- Group Card 4 -->
+            <div class="group-card">
+                <div class="card-top">
+                    <img src="/images/summer.jpg" alt="Summer Trip" class="group-img">
+                    <div class="card-info">
+                        <h3>Summer Trip</h3>
+                        <p>3 members • Planning</p>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <span class="balance negative">You owe: 50 DH</span>
+                    <a href="/groups/summer-trip" class="view-group-btn">View Details →</a>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+</html>

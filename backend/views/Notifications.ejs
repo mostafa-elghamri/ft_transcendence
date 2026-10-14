@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Splitify</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --sidebar-bg: #111827;
+            --main-bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --primary-green: #10b981;
+            --text-dark: #111827;
+            --text-gray: #6b7280;
+            --border-color: #e5e7eb;
+            --unread-bg: #f0fdf4;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { display: flex; height: 100vh; background-color: var(--main-bg); overflow: hidden; }
+
+        /* --- SIDEBAR (Matches Dashboard Exactly) --- */
+        .sidebar {
+            width: 260px; background-color: var(--sidebar-bg); color: white;
+            display: flex; flex-direction: column; padding: 20px; flex-shrink: 0;
+        }
+
+        .logo { font-size: 20px; font-weight: 700; margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
+        .logo i { color: var(--primary-green); }
+
+        .nav-menu { list-style: none; flex-grow: 1; }
+        .nav-item { margin-bottom: 10px; }
+        .nav-link {
+            display: flex; align-items: center; padding: 12px 15px; color: #9ca3af;
+            text-decoration: none; border-radius: 8px; transition: 0.3s; font-weight: 500;
+        }
+        .nav-link:hover, .nav-link.active { background-color: rgba(255, 255, 255, 0.1); color: white; }
+        .nav-link i { width: 25px; font-size: 18px; }
+
+        .badge {
+            background-color: #ef4444; color: white; font-size: 12px;
+            padding: 2px 8px; border-radius: 10px; margin-left: auto;
+        }
+
+        .user-profile-mini {
+            display: flex; align-items: center; gap: 12px; padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .avatar-small {
+            width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
+            background-color: #374151;
+        }
+        .user-info h4 { font-size: 14px; font-weight: 600; }
+        .user-info p { font-size: 12px; color: #9ca3af; }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { flex-grow: 1; padding: 30px 40px; overflow-y: auto; }
+
+        .page-header { 
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; 
+        }
+        .page-title h1 { font-size: 28px; color: var(--text-dark); margin-bottom: 5px; }
+        .page-title p { color: var(--text-gray); font-size: 15px; }
+
+        .header-actions { display: flex; gap: 10px; }
+        .btn-mark-read {
+            background: transparent; border: 1px solid var(--border-color); color: var(--text-gray);
+            padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500;
+            cursor: pointer; transition: 0.2s;
+        }
+        .btn-mark-read:hover { background: white; color: var(--text-dark); }
+
+        /* --- NOTIFICATION LIST --- */
+        .notification-list { max-width: 800px; }
+
+        .notification-card {
+            background: var(--card-bg); border-radius: 12px; padding: 20px;
+            margin-bottom: 15px; display: flex; gap: 15px; align-items: flex-start;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02); transition: 0.2s; border-left: 3px solid transparent;
+        }
+
+        .notification-card.unread {
+            background-color: var(--unread-bg); border-left-color: var(--primary-green);
+        }
+
+        .notif-avatar {
+            width: 48px; height: 48px; border-radius: 50%; object-fit: cover;
+            background-color: #d1d5db; flex-shrink: 0;
+        }
+
+        .notif-content { flex-grow: 1; }
+        .notif-text { font-size: 14px; color: var(--text-dark); line-height: 1.5; margin-bottom: 6px; }
+        .notif-text strong { font-weight: 600; }
+        .notif-meta { font-size: 12px; color: var(--text-gray); display: flex; align-items: center; gap: 10px; }
+        
+        .notif-group-tag {
+            background-color: #f3f4f6; padding: 2px 8px; border-radius: 4px;
+            font-weight: 500; color: var(--text-dark);
+        }
+
+        .notif-time { margin-left: auto; white-space: nowrap; }
+
+        .notif-action-btn {
+            margin-top: 10px; padding: 6px 12px; border-radius: 6px;
+            font-size: 12px; font-weight: 600; cursor: pointer; border: none;
+            background-color: var(--primary-green); color: white; transition: 0.2s;
+        }
+        .notif-action-btn:hover { opacity: 0.9; }
+
+        .empty-state {
+            text-align: center; padding: 60px 20px; color: var(--text-gray);
+        }
+        .empty-state i { font-size: 40px; margin-bottom: 15px; color: #d1d5db; }
+
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-users"></i> Splitify
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="/dashboard" class="nav-link">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/MyGroups" class="nav-link">
+                    <i class="fa-solid fa-layer-group"></i> My Groups
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/notifications" class="nav-link active">
+                    <i class="fa-regular fa-bell"></i> Notifications
+                    <span class="badge">3</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/friends" class="nav-link">
+                    <i class="fa-solid fa-user-group"></i> Friends
+                </a>
+            </li>
+        </ul>
+
+        <div class="user-profile-mini">
+            <img src="https://via.placeholder.com/40/374151/ffffff?text=A" alt="Amine" class="avatar-small">
+            <div class="user-info">
+                <h4>Mohamed El Aidi</h4>
+                <p>@Aidix</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        
+        <div class="page-header">
+            <div class="page-title">
+                <h1>Notifications</h1>
+                <p>You have 3 unread notifications</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-mark-read">Mark all as read</button>
+            </div>
+        </div>
+
+        <div class="notification-list">
+            
+            <!-- Unread Notification 1 -->
+            <div class="notification-card unread">
+                <img src="https://via.placeholder.com/48/9ca3af/ffffff?text=Y" alt="Yassine" class="notif-avatar">
+                <div class="notif-content">
+                    <div class="notif-text">
+                        <strong>Yassine</strong> added a new expense in <span class="notif-group-tag">Akchour Trip</span>
+                    </div>
+                    <div class="notif-meta">
+                        Food - 200 DH
+                        <span class="notif-time">2 hours ago</span>
+                    </div>
+                    <button class="notif-action-btn">View Expense</button>
+                </div>
+            </div>
+
+            <!-- Unread Notification 2 -->
+            <div class="notification-card unread">
+                <img src="https://via.placeholder.com/48/9ca3af/ffffff?text=O" alt="Omar" class="notif-avatar">
+                <div class="notif-content">
+                    <div class="notif-text">
+                        <strong>Omar</strong> paid you <strong>150 DH</strong> in <span class="notif-group-tag">Casa Weekend</span>
+                    </div>
+                    <div class="notif-meta">
+                        Payment settled
+                        <span class="notif-time">2 hours ago</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unread Notification 3 -->
+            <div class="notification-card unread">
+                <img src="https://via.placeholder.com/48/9ca3af/ffffff?text=H" alt="Hamza" class="notif-avatar">
+                <div class="notif-content">
+                    <div class="notif-text">
+                        <strong>Hamza</strong> sent you a message in <span class="notif-group-tag">University Friends</span>
+                    </div>
+                    <div class="notif-meta">
+                        "Hey, are we still on for Friday?"
+                        <span class="notif-time">5 hours ago</span>
+                    </div>
+                    <button class="notif-action-btn">Reply</button>
+                </div>
+            </div>
+
+            <!-- Read Notification -->
+            <div class="notification-card">
+                <img src="https://via.placeholder.com/48/9ca3af/ffffff?text=S" alt="System" class="notif-avatar">
+                <div class="notif-content">
+                    <div class="notif-text">
+                        Welcome to <strong>Splitify</strong>! Start by creating your first group.
+                    </div>
+                    <div class="notif-meta">
+                        System notification
+                        <span class="notif-time">Yesterday</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+</html>

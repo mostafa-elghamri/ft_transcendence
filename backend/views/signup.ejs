@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Splitifyr — Log in or sign up</title>
+</head>
+<body>
+
+<h1>Splitify</h1>
+<p>Split expenses. Stay together.</p>
+<p>Together we spend, better.</p>
+<p>Create groups, add expenses, track balances, and chat with your friends — all in one place.</p>
+
+<hr>
+
+<!-- LOGIN FORM -->
+<h2>Welcome back 👋</h2>
+<p>Log in to your account</p>
+
+<form action="/login" method="POST">
+  <label for="login-email">Email address</label><br>
+  <input type="email" id="login-email" name="email" required><br><br>
+
+  <label for="login-password">Password</label><br>
+  <input type="password" id="login-password" name="password" required><br><br>
+
+  <input type="checkbox" id="remember" name="remember">
+  <label for="remember">Remember me</label><br><br>
+
+  <a href="#">Forgot password?</a><br><br>
+
+  <button type="submit">Log in</button>
+</form>
+
+<p>Don't have an account? <a href="#signup-section">Sign up</a></p>
+
+<hr>
+
+<!-- SIGNUP FORM -->
+<h2 id="signup-section">Create your account</h2>
+<p>Start splitting expenses with your people</p>
+
+<form action="/signup" method="POST">
+  <label for="signup-name">Full name</label><br>
+  <input type="text" id="signup-name" name="fullName" required><br><br>
+
+  <label for="signup-email">Email address</label><br>
+  <input type="email" id="signup-email" name="email" required><br><br>
+
+  <label for="signup-password">Password</label><br>
+  <input type="password" id="signup-password" name="password" required><br>
+  <small>Use 8+ characters with a number or symbol</small><br><br>
+
+  <label for="signup-confirm">Confirm password</label><br>
+  <input type="password" id="signup-confirm" name="confirmPassword" required><br><br>
+
+  <input type="checkbox" id="terms" name="terms" required>
+  <label for="terms">I agree to the <a href="#">Terms</a> & <a href="#">Privacy Policy</a></label><br><br>
+
+  <button type="submit">Create account</button>
+</form>
+
+<p>Already have an account? <a href="#">Log in</a></p>
+
+</body>
+</html>

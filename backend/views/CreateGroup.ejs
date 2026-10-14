@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Group - SplitTogether</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --sidebar-bg: #111827;
+            --main-bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --primary-green: #10b981;
+            --primary-green-hover: #059669;
+            --text-dark: #111827;
+            --text-gray: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { display: flex; height: 100vh; background-color: var(--main-bg); overflow: hidden; }
+
+        /* --- SIDEBAR (Matches Dashboard Exactly) --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            flex-shrink: 0;
+        }
+
+        .logo { font-size: 20px; font-weight: 700; margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
+        .logo i { color: var(--primary-green); }
+
+        .nav-menu { list-style: none; flex-grow: 1; }
+        .nav-item { margin-bottom: 10px; }
+        .nav-link {
+            display: flex; align-items: center; padding: 12px 15px; color: #9ca3af;
+            text-decoration: none; border-radius: 8px; transition: 0.3s; font-weight: 500;
+        }
+        .nav-link:hover, .nav-link.active { background-color: rgba(255, 255, 255, 0.1); color: white; }
+        .nav-link i { width: 25px; font-size: 18px; }
+
+        .user-profile-mini {
+            display: flex; align-items: center; gap: 12px; padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .avatar-small {
+            width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
+            background-color: #374151;
+        }
+        .user-info h4 { font-size: 14px; font-weight: 600; }
+        .user-info p { font-size: 12px; color: #9ca3af; }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { flex-grow: 1; padding: 30px 40px; overflow-y: auto; }
+
+        .page-header { margin-bottom: 30px; }
+        .page-header h1 { font-size: 28px; color: var(--text-dark); margin-bottom: 5px; }
+        .page-header p { color: var(--text-gray); font-size: 15px; }
+
+        /* --- CREATE GROUP FORM CARD --- */
+        .form-card {
+            background: var(--card-bg);
+            max-width: 600px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label {
+            display: block; font-size: 14px; font-weight: 600;
+            color: var(--text-dark); margin-bottom: 8px;
+        }
+        .form-input {
+            width: 100%; padding: 12px 15px; border: 1px solid var(--border-color);
+            border-radius: 8px; font-size: 14px; outline: none; transition: 0.2s;
+        }
+        .form-input:focus { border-color: var(--primary-green); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
+        
+        textarea.form-input { resize: vertical; min-height: 100px; }
+
+        /* Image Upload Placeholder */
+        .image-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 20px;
+        }
+        .image-upload-area:hover { border-color: var(--primary-green); background-color: #f0fdf4; }
+        .image-upload-area i { font-size: 30px; color: var(--text-gray); margin-bottom: 10px; }
+        .image-upload-area p { font-size: 14px; color: var(--text-gray); }
+        .image-upload-area span { color: var(--primary-green); font-weight: 600; }
+
+        /* Member Tags Input Simulation */
+        .tags-container {
+            display: flex; flex-wrap: wrap; gap: 8px; padding: 8px;
+            border: 1px solid var(--border-color); border-radius: 8px;
+            background: white; align-items: center;
+        }
+        .tag {
+            background-color: #ecfdf5; color: var(--primary-green);
+            padding: 4px 10px; border-radius: 20px; font-size: 13px;
+            font-weight: 500; display: flex; align-items: center; gap: 5px;
+        }
+        .tag i { cursor: pointer; font-size: 12px; }
+        .tags-input {
+            border: none; outline: none; flex-grow: 1; padding: 4px;
+            font-size: 14px; min-width: 120px;
+        }
+
+        /* Buttons */
+        .form-actions { display: flex; gap: 15px; margin-top: 30px; }
+        .btn-primary {
+            background-color: var(--primary-green); color: white; border: none;
+            padding: 12px 24px; border-radius: 8px; font-weight: 600;
+            cursor: pointer; font-size: 14px; flex-grow: 1; transition: 0.2s;
+        }
+        .btn-primary:hover { background-color: var(--primary-green-hover); }
+        
+        .btn-secondary {
+            background-color: transparent; color: var(--text-gray); border: 1px solid var(--border-color);
+            padding: 12px 24px; border-radius: 8px; font-weight: 600;
+            cursor: pointer; font-size: 14px; transition: 0.2s; text-decoration: none;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .btn-secondary:hover { background-color: #f9fafb; color: var(--text-dark); }
+
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-users"></i> SplitTogether
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="/dashboard" class="nav-link">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/groups" class="nav-link active">
+                    <i class="fa-solid fa-layer-group"></i> My Groups
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/notifications" class="nav-link">
+                    <i class="fa-regular fa-bell"></i> Notifications
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/friends" class="nav-link">
+                    <i class="fa-solid fa-user-group"></i> Friends
+                </a>
+            </li>
+        </ul>
+
+        <div class="user-profile-mini">
+            <img src="https://via.placeholder.com/40/374151/ffffff?text=A" alt="Amine" class="avatar-small">
+            <div class="user-info">
+                <h4>Amine Khaliloufi</h4>
+                <p>@amine</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        
+        <div class="page-header">
+            <h1>Create New Group</h1>
+            <p>Set up a new group to start splitting expenses with your people.</p>
+        </div>
+
+        <div class="form-card">
+            <form action="/CreateGroup" method="POST" enctype="multipart/form-data">
+                
+                <!-- Group Cover Image Upload -->
+                <label class="form-label">Group Cover Image</label>
+                <div class="image-upload-area" onclick="document.getElementById('coverImage').click()">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <p><span>Click to upload</span> or drag and drop</p>
+                    <p style="font-size: 12px; margin-top: 5px;">SVG, PNG, JPG (max. 2MB)</p>
+                    <input type="file" id="coverImage" name="coverImage" hidden accept="image/*">
+                </div>
+
+                <!-- Group Name -->
+                <div class="form-group">
+                    <label class="form-label" for="groupName">Group Name</label>
+                    <input type="text" id="groupName" name="groupName" class="form-input" placeholder="e.g., Akchour Trip 2024" required>
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label class="form-label" for="groupDesc">Description (Optional)</label>
+                    <textarea id="groupDesc" name="groupDesc" class="form-input" placeholder="What is this group for?"></textarea>
+                </div>
+
+                <!-- Add Members -->
+                <div class="form-group">
+                    <label class="form-label">Add Members</label>
+                    <div class="tags-container">
+                        <div class="tag">Yassine <i class="fa-solid fa-xmark"></i></div>
+                        <div class="tag">Omar <i class="fa-solid fa-xmark"></i></div>
+                        <input type="text" class="tags-input" placeholder="Type email or name...">
+                    </div>
+                    <p style="font-size: 12px; color: var(--text-gray); margin-top: 6px;">Press Enter to add a member</p>
+                </div>
+
+                <!-- Actions -->
+                <div class="form-actions">
+                    <a href="/dashboard" class="btn-secondary">Cancel</a>
+                    <button type="submit" class="btn-primary">Create Group</button>
+                </div>
+
+            </form>
+        </div>
+
+    </main>
+
+</body>
+</html>

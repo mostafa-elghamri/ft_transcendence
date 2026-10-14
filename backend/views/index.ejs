@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Auth</title>
+<style>
+  body { font-family: sans-serif; margin: 2rem; }
+  form { margin-bottom: 2rem; }
+  label { display: block; margin-top: 0.5rem; }
+  input { display: block; margin-top: 0.25rem; }
+  button { margin-top: 1rem; }
+  pre { background: #eee; padding: 0.5rem; border: 1px solid #ccc; }
+</style>
+</head>
+<body>    
+
+<h1>Sign In</h1>
+<form id="loginForm">
+  <label>Email
+    <input type="email" name="email" required>
+  </label>
+  <label>Password
+    <input type="password" name="password" required>
+  </label>
+  <button type="submit">Sign In</button>
+</form>
+
+<h1>Sign Up</h1>
+<form id="signupForm">
+  <label>Name
+    <input type="text" name="name" required>
+  </label>
+  <label>Email
+    <input type="email" name="email" required>
+  </label>
+  <label>Password
+    <input type="password" name="password" required>
+  </label>
+  <button type="submit">Sign Up</button>
+</form>
+
+<h2>Response</h2>
+<pre id="output">(waiting)</pre>
+
+<script>
+  const LOGIN_URL  = "https://example.com/api/login";
+  const SIGNUP_URL = "https://example.com/api/signup";
+  const output = document.getElementById("output");
+
+  async function sendRequest(url, body) {
+    output.textContent = "Sending request...";
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const text = await res.text();
+      output.textContent = `Status: ${res.status}\n\n${text}`;
+    } catch (err) {
+      output.textContent = "Error: " + err.message;
+    }
+  }
+
+  document.getElementById("loginForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target));
+    sendRequest(LOGIN_URL, data);
+  });
+
+  document.getElementById("signupForm").addEventListener("submit", e => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target));
+    sendRequest(SIGNUP_URL, data);
+  });
+</script>
+
+</body>
+</html>

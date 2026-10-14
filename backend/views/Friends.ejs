@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friends - Splitify</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --sidebar-bg: #111827;
+            --main-bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --primary-green: #10b981;
+            --primary-green-hover: #059669;
+            --text-dark: #111827;
+            --text-gray: #6b7280;
+            --border-color: #e5e7eb;
+            --red-balance: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { display: flex; height: 100vh; background-color: var(--main-bg); overflow: hidden; }
+
+        /* --- SIDEBAR (Consistent Across All Pages) --- */
+        .sidebar {
+            width: 260px; background-color: var(--sidebar-bg); color: white;
+            display: flex; flex-direction: column; padding: 20px; flex-shrink: 0;
+        }
+
+        .logo { font-size: 20px; font-weight: 700; margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
+        .logo i { color: var(--primary-green); }
+
+        .nav-menu { list-style: none; flex-grow: 1; }
+        .nav-item { margin-bottom: 10px; }
+        .nav-link {
+            display: flex; align-items: center; padding: 12px 15px; color: #9ca3af;
+            text-decoration: none; border-radius: 8px; transition: 0.3s; font-weight: 500;
+        }
+        .nav-link:hover, .nav-link.active { background-color: rgba(255, 255, 255, 0.1); color: white; }
+        .nav-link i { width: 25px; font-size: 18px; }
+
+        .badge {
+            background-color: var(--red-balance); color: white; font-size: 12px;
+            padding: 2px 8px; border-radius: 10px; margin-left: auto;
+        }
+
+        .user-profile-mini {
+            display: flex; align-items: center; gap: 12px; padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .avatar-small {
+            width: 40px; height: 40px; border-radius: 50%; object-fit: cover;
+            background-color: #374151;
+        }
+        .user-info h4 { font-size: 14px; font-weight: 600; }
+        .user-info p { font-size: 12px; color: #9ca3af; }
+
+        /* --- MAIN CONTENT --- */
+        .main-content { flex-grow: 1; padding: 30px 40px; overflow-y: auto; }
+
+        .page-header { 
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; 
+        }
+        .page-title h1 { font-size: 28px; color: var(--text-dark); margin-bottom: 5px; }
+        .page-title p { color: var(--text-gray); font-size: 15px; }
+
+        /* Search Bar */
+        .search-container { position: relative; max-width: 400px; margin-bottom: 30px; }
+        .search-input {
+            width: 100%; padding: 12px 15px 12px 40px; border: 1px solid var(--border-color);
+            border-radius: 8px; font-size: 14px; outline: none; transition: 0.2s;
+            background-color: var(--card-bg);
+        }
+        .search-input:focus { border-color: var(--primary-green); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
+        .search-icon {
+            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+            color: var(--text-gray); font-size: 14px; pointer-events: none;
+        }
+
+        /* Section Headers */
+        .section-label {
+            font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--text-gray); margin-bottom: 15px; margin-top: 10px;
+        }
+
+        /* Friends List */
+        .friends-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 40px; }
+
+        .friend-card {
+            background: var(--card-bg); border-radius: 12px; padding: 16px 20px;
+            display: flex; align-items: center; gap: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: 0.2s;
+        }
+        .friend-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+
+        .friend-avatar {
+            width: 48px; height: 48px; border-radius: 50%; object-fit: cover;
+            background-color: #d1d5db; flex-shrink: 0;
+        }
+
+        .friend-info { flex-grow: 1; }
+        .friend-name { font-size: 15px; font-weight: 600; color: var(--text-dark); margin-bottom: 2px; }
+        .friend-meta { font-size: 13px; color: var(--text-gray); }
+
+        .friend-actions { display: flex; gap: 8px; }
+        
+        .btn-action {
+            padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600;
+            cursor: pointer; border: none; transition: 0.2s;
+        }
+        .btn-add { background-color: var(--primary-green); color: white; }
+        .btn-add:hover { background-color: var(--primary-green-hover); }
+        
+        .btn-remove { background-color: transparent; border: 1px solid var(--border-color); color: var(--text-gray); }
+        .btn-remove:hover { border-color: var(--red-balance); color: var(--red-balance); }
+
+        .btn-pending { background-color: #f3f4f6; color: var(--text-gray); cursor: default; }
+
+        /* Request Cards Specifics */
+        .request-card { border-left: 3px solid var(--primary-green); }
+
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-users"></i> Splitify
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="/dashboard" class="nav-link">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/MyGroups" class="nav-link">
+                    <i class="fa-solid fa-layer-group"></i> My Groups
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/notifications" class="nav-link">
+                    <i class="fa-regular fa-bell"></i> Notifications
+                    <span class="badge">3</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/friends" class="nav-link active">
+                    <i class="fa-solid fa-user-group"></i> Friends
+                </a>
+            </li>
+        </ul>
+
+        <div class="user-profile-mini">
+            <img src="/images/amine.jpg" alt="Amine" class="avatar-small">
+            <div class="user-info">
+                <h4>Amine Khaliloufi</h4>
+                <p>@amine</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        
+        <div class="page-header">
+            <div class="page-title">
+                <h1>Friends</h1>
+                <p>Manage your connections and split expenses with people you trust.</p>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <div class="search-container">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" class="search-input" placeholder="Search by name or email...">
+        </div>
+
+        <!-- Friend Requests Section -->
+        <div class="section-label">Friend Requests (2)</div>
+        <div class="friends-list">
+            
+            <div class="friend-card request-card">
+                <img src="/images/sara.jpg" alt="Sara" class="friend-avatar">
+                <div class="friend-info">
+                    <div class="friend-name">Sara Bennani</div>
+                    <div class="friend-meta">sara.bennani@email.com • Mutual friends: 3</div>
+                </div>
+                <div class="friend-actions">
+                    <button class="btn-action btn-add">Accept</button>
+                    <button class="btn-action btn-remove">Decline</button>
+                </div>
+            </div>
+
+            <div class="friend-card request-card">
+                <img src="/images/karim.jpg" alt="Karim" class="friend-avatar">
+                <div class="friend-info">
+                    <div class="friend-name">Karim El Fassi</div>
+                    <div class="friend-meta">karim.ef@email.com • From University Friends group</div>
+                </div>
+                <div class="friend-actions">
+                    <button class="btn-action btn-add">Accept</button>
+                    <button class="btn-action btn-remove">Decline</button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Your Friends Section -->
+        <div class="section-label">Your Friends (4)</div>
+        <div class="friends-list">
+            
+            <div class="friend-card">
+                <img src="/images/yassine.jpg" alt="Yassine" class="friend-avatar">
+                <div class="friend-info">
+                    <div class="friend-name">Yassine Tazi</div>
+                    <div class="friend-meta">In 2 groups together • Last active: 2h ago</div>
+                </div>
+                <div class="friend-actions">
+                    <button class="btn-action btn-remove">Remove</button>
+                </div>
+            </div>
+
+            <div class="friend-card">
+                <img src="/images/omar.jpg" alt="Omar" class="friend-avatar">
+                <div class="friend-info">
+                    <div class="friend-name">Omar Chraibi</div>
+                    <div class="friend-meta">In 1 group together • Last active: 5h ago</div>
+                </div>
+                <div class="friend-actions">
+                    <button class="btn-action btn-remove">Remove</button>
+                </div>
+            </div>
+
+            <div class="friend-card">
+                <img src="/images/hamza.jpg" alt="Hamza" class="friend-avatar">
+                <div class="friend-info">
+                    <div class="friend-name">Hamza Bennis</div>
+                    <div class="friend-meta">In 3 groups together • Last active: 1d ago</div>
+                </div>
+                <div class="friend-actions">
+                    <button class="btn-action btn-remove">Remove</button>
+                </div>
+            </div>
+
+            <div class="friend-card">
+                <img src="/images/nadia.jpg" alt="Nadia" class="friend-avatar">
+                <div class="friend-info">
+                    <div class="friend-name"></div>
+                    <div class="friend-meta">No shared groups • Last active: 3d ago</div>
+                </div>
+                <div class="friend-actions">
+                    <button class="btn-action btn-remove">Remove</button>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+</body>
+</html>
