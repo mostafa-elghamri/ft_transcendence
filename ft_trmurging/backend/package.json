@@ -1,0 +1,33 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "this is the ft_transcendence backend .json file",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js",
+    "dev": "nodemon src/main.js",
+    "devStart": "nodemon src/main.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "connect-livereload": "^0.6.1",
+    "connect-mongo": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "livereload": "^0.10.3",
+    "mongodb": "^7.6.0",
+    "mongoose": "^9.10.0",
+    "socket.io": "^4.8.3",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.4"
+  }
+}
